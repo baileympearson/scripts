@@ -1,4 +1,4 @@
-#! /bin/node
+#! /usr/bin/env node
 
 /*
  * Simple script to remove duplicate files from downloads
@@ -9,17 +9,19 @@
  *	tested in filterPredicate().
  */
 
-let fs = require('fs');
+let fs = require('fs'),
+	process = require('process'),
+	chokidar = require('chokidar');
+
 let DOWNLOAD_LOCATION = '/home/bailey/Downloads';
+let REGEX = /.* \(\d\).*/;
 
-let files = fs.readdirSync(DOWNLOAD_LOCATION);
 
-let filterPredicate = file => {
-	let fileRegex = /.* \(\d\)\..*/;
-	return fileRegex.test(file);
-};
+process.chdir(DOWNLOAD_LOCATION);
 
-files.filter(filterPredicate)
-	.forEach(file => { 
-	fs.unlinkSync(`${DOWNLOAD_LOCATION}/${file}`); 
+chokidar.watch('.').on('add', path => {
+	if (REGEX.test(path)) {
+		fs.unlinkSync(path); 
+		console.log(`removed ${path}`);
+	}
 });
