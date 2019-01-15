@@ -1,0 +1,25 @@
+#! /bin/node
+
+/*
+ * Simple script to remove duplicate files from downloads
+ * 	removes all files in the form of * (number).extension
+ * 	specifically targets stupid duplicates from chrome
+ *
+ *	To change the behavior of the script, change the regex
+ *	tested in filterPredicate().
+ */
+
+let fs = require('fs');
+let DOWNLOAD_LOCATION = '/home/bailey/Downloads';
+
+let files = fs.readdirSync(DOWNLOAD_LOCATION);
+
+let filterPredicate = file => {
+	let fileRegex = /.* \(\d\)\..*/;
+	return fileRegex.test(file);
+};
+
+files.filter(filterPredicate)
+	.forEach(file => { 
+	fs.unlinkSync(`${DOWNLOAD_LOCATION}/${file}`); 
+});
